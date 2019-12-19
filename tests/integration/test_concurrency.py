@@ -1,3 +1,4 @@
+import sys
 import time
 import threading
 from tests.integration import IntegrationTest
@@ -11,11 +12,10 @@ class ConcurrencyTests(IntegrationTest):
     def setUp(self):
         super(ConcurrencyTests, self).setUp()
 
-    @parameterized.expand((k,) for k in range(100))
-    def test_memory_storage_fixed_window(self, _):
+    def test_memory_storage_fixed_window(self):
         storage = MemoryStorage()
         limiter = FixedWindowRateLimiter(storage)
-        per_second = RateLimitItemPerSecond(1000)
+        per_second = RateLimitItemPerSecond(100)
 
         [limiter.hit(per_second, uuid4().hex) for _ in range(1000)]
 
@@ -23,41 +23,38 @@ class ConcurrencyTests(IntegrationTest):
         hits = []
 
         def hit():
-            for i in range(1000):
-                if limiter.hit(per_second, key):
-                    hits.append(None)
+            if limiter.hit(per_second, key):
+                hits.append(None)
 
         start = time.time()
 
-        threads = [threading.Thread(target=hit) for _ in range(10)]
+        threads = [threading.Thread(target=hit) for _ in range(1000)]
         [t.start() for t in threads]
         [t.join() for t in threads]
 
         self.assertTrue(time.time() - start < 1)
-        self.assertEqual(len(hits), 1000)
+        self.assertEqual(len(hits), 100)
 
-    @parameterized.expand((k,) for k in range(100))
-    def test_memory_storage_moving_window(self, _):
+    def test_memory_storage_moving_window(self):
         storage = MemoryStorage()
         limiter = MovingWindowRateLimiter(storage)
-        per_second = RateLimitItemPerSecond(1000)
+        per_second = RateLimitItemPerSecond(100)
 
-        [limiter.hit(per_second, uuid4().hex) for _ in range(1000)]
+        [limiter.hit(per_second, uuid4().hex) for _ in range(100)]
 
         key = uuid4().hex
         hits = []
 
         def hit():
-            for i in range(1000):
-                if limiter.hit(per_second, key):
-                    hits.append(None)
+            if limiter.hit(per_second, key):
+                hits.append(None)
 
         start = time.time()
 
-        threads = [threading.Thread(target=hit) for _ in range(10)]
+        threads = [threading.Thread(target=hit) for _ in range(1000)]
         [t.start() for t in threads]
         [t.join() for t in threads]
 
         self.assertTrue(time.time() - start < 1)
-        self.assertEqual(len(hits), 1000)
+        self.assertEqual(len(hits), 100)
 
