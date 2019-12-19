@@ -1,5 +1,6 @@
 -r main.txt
 nose
+parameterized
 mock
 coverage
 nose-cov
