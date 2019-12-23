@@ -6,7 +6,7 @@ jobs:
   - python: "2.7"
     env:
      - CMD=all-tests
-     - COVERAGE=true
+     - COVERAGE=1
   - python: "3.7"
   - python: "pypy"
   - python: "pypy3"
@@ -31,5 +31,4 @@ services:
 
 script: make -f Makefile.tests $CMD
 after_success:
-  - test $COVERAGE = "true" &&
-    coveralls
+  - test $COVERAGE && coveralls
