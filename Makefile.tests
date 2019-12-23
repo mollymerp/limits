@@ -108,12 +108,12 @@ memcached-gae-clean:
 _test_fixtures: redis-stop memcached-stop redis-start memcached-gae-install memcached-start
 
 tests: _test_fixtures
-	nosetests tests --with-cov -v --with-timer --timer-top-n 10
+	pytest -m unit --durations=10
 
 integration-tests: _test_fixtures
-	INTEGRATION_TESTS=1 nosetests tests/integration --with-cov -v --with-timer --timer-top-n 10
+	pytest -m integration
 
 all-tests: _test_fixtures
-	INTEGRATION_TESTS=1 nosetests tests --with-cov -v --with-timer --timer-top-n 10
+	pytest -m unit,integration --durations=10
 
 .PHONY: test

@@ -1,16 +1,19 @@
 import sys
 import time
 import threading
+import unittest
+
+import pytest
+
 from tests.integration import IntegrationTest
-from parameterized import parameterized
 from uuid import uuid4
 from limits.storage import MemoryStorage
 from limits.strategies import FixedWindowRateLimiter, MovingWindowRateLimiter
 from limits.limits import RateLimitItemPerSecond
 
-class ConcurrencyTests(IntegrationTest):
-    def setUp(self):
-        super(ConcurrencyTests, self).setUp()
+
+@pytest.mark.integration
+class ConcurrencyTests(unittest.TestCase):
 
     def test_memory_storage_fixed_window(self):
         storage = MemoryStorage()
